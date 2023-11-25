@@ -75,8 +75,27 @@ func GetTodo(todoId string) (models.Todo, error) {
 	return todo, err
 }
 
-func UpdateTodo(s models.Todo)  {
+func UpdateTodo(todoId string, t models.Todo) (int64, error)  {
+	db := connections.CeateConnection()
+	defer db.Close()
 
+
+	sqlQuery := `UPDATE todos SET title = $2, description = $3, iscompleted = $4 WHERE id = $1`
+	res, err := db.Exec(sqlQuery, todoId, t.Title, t.Description, t.IsCompleted)
+
+	if err != nil {
+		log.Fatalf("Could not execute query %v", err)
+	}
+
+	rowsAffected, err := res.RowsAffected()
+
+	if err != nil {
+		log.Fatalf("Could not get affected rows %v", err)
+	}
+
+	fmt.Printf("Total rows affected %v", rowsAffected)
+
+	return rowsAffected, err
 }
 
 func DeleteTodo(s models.Todo)  {

@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -60,7 +61,27 @@ func GetSingleTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
 
+	var todo models.Todo
+
+	err := json.NewDecoder(r.Body).Decode(&todo)
+	if err != nil {
+		log.Fatalf("failed to decode json body %v", err)
+	}
+
+	updatedRows, err := controllers.UpdateTodo(params["id"], todo)
+	fmt.Println("total rows affected", updatedRows)
+
+	if err != nil {
+		log.Fatalf("could not update stock %v", err)
+	}
+
+	json.NewEncoder(w).Encode(models.MsgResponse{
+		Success: true,
+		Message: "Todo updated succesfully",
+	})
 }
 
 func DeleteTodo(w http.ResponseWriter, r *http.Request) {
