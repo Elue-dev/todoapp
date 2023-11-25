@@ -7,6 +7,7 @@ import (
 
 	"github.com/elue-dev/todoapi/controllers"
 	"github.com/elue-dev/todoapi/models"
+	"github.com/gorilla/mux"
 )
 
 func AddTodo(w http.ResponseWriter, r *http.Request) {
@@ -29,11 +30,33 @@ func AddTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func GetAllTodos(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
 
+	todos, err := controllers.GetTodos()
+	if err != nil {
+		log.Fatalf("Could not get all todos %v", err)
+	}
+
+	json.NewEncoder(w).Encode(models.Response{
+		Success: true,
+		Data: todos,
+	})
 }
 
 func GetSingleTodo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
 
+	result, err := controllers.GetTodo(params["id"])
+
+	if err != nil {
+		log.Fatalf("failed to get todo %v", err)
+	}
+	
+	json.NewEncoder(w).Encode(models.Response{
+		Success: true,
+		Data: result,
+	})
 }
 
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {

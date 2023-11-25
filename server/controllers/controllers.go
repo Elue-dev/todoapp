@@ -1,6 +1,8 @@
 package controllers
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 
 	"github.com/elue-dev/todoapi/connections"
@@ -39,7 +41,7 @@ func GetTodos() ([]models.Todo, error) {
 
 	for rows.Next() {
 		var todo models.Todo
-		err = rows.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.IsCompleted, todo.CreatedAt, todo.UpdatedAt)
+		err = rows.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.IsCompleted, &todo.CreatedAt, &todo.UpdatedAt)
 		if err != nil {
 			log.Fatalf("Could not scan rows %v", err)
 		}
@@ -49,8 +51,28 @@ func GetTodos() ([]models.Todo, error) {
 	return todos, err
 }
 
-func GetTodo(s models.Todo) {
+func GetTodo(todoId string) (models.Todo, error) {
+	db := connections.CeateConnection()
+	defer db.Close()
 
+	var todo models.Todo
+
+	sqlQuery := `SELECT * FROM todos WHERE id = $1`
+	rows := db.QueryRow(sqlQuery, todoId)
+	
+	err := rows.Scan(&todo.ID, &todo.Title, &todo.Description, &todo.IsCompleted, &todo.CreatedAt, &todo.UpdatedAt)
+
+	switch err {
+		case sql.ErrNoRows:
+			fmt.Println("No rows were returned.")
+			return todo, nil
+		case nil:
+			return todo, nil
+		default:
+			log.Fatalf("Unable to scan rows %v", err)
+	}
+
+	return todo, err
 }
 
 func UpdateTodo(s models.Todo)  {

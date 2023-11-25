@@ -14,3 +14,8 @@ type Response struct {
 	Success bool `json:"success"`
 	Data interface{} `json:"data"`
 }
+
+type MsgResponse struct {
+	Success bool `json:"success"`
+	Message string `json:"string"`
+}
