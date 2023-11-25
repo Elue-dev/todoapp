@@ -22,3 +22,8 @@ type CustomTodo struct {
 	Description string `json:"description"`
 	IsCompleted bool `json:"is_completed"`
 }
+
+type Response struct {
+	Success bool `json:"success"`
+	Data interface{} `json:"data"`
+}

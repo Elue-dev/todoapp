@@ -5,8 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/elue-dev/todoapi/router"
 	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
 	"github.com/joho/godotenv"
 )
 
@@ -16,12 +16,10 @@ func main() {
 	  log.Fatal("Error loading .env file")
 	}
 
-	router := mux.NewRouter()
+	r := router.Router()
 
 	allowedOrigins := handlers.AllowedOrigins([]string{"*"})
 
-
-
 	fmt.Println("Go server running on port 8080")
-	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(allowedOrigins)(router)))
+	log.Fatal(http.ListenAndServe(":8080", handlers.CORS(allowedOrigins)(r)))
 }
