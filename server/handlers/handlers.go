@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/elue-dev/todoapi/controllers"
 	"github.com/elue-dev/todoapi/models"
 )
 
@@ -18,7 +19,12 @@ func AddTodo(w http.ResponseWriter, r *http.Request) {
 		log.Fatalf("failed to decode json body %v", err)
 	}
 
-	// result := controllers.CreateTodo()
+	result := controllers.CreateTodo(todo)
+	
+	json.NewEncoder(w).Encode(models.Response{
+		Success: true,
+		Data: result,
+	})
 
 }
 
