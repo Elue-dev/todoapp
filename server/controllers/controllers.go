@@ -9,7 +9,7 @@ func CreateTodo(todo models.Todo) models.Todo {
 	db := connections.CeateConnection()
 	defer db.Close()
 
-
+	sqlQuery := `INSERT INTO todos (title, description, isCompleted)`
 }
 
 func GetTodos(s models.Todo) {
