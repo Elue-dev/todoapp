@@ -2,6 +2,7 @@ package helpers
 
 // TODO: create helper functions for json responses
 // TODO: send appropriate status codes for json responses
+// TODO: check if user already exists before inserting into db
 
 func ValidateRequestBody(title, description string) bool {
 	if title == "" || description == "" {
