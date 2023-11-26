@@ -9,6 +9,15 @@ type Todo struct {
 	UpdatedAt string `json:"updated_at"`
 }
 
+type User struct {
+	ID *string `json:"id"`
+	Email string `json:"email"`
+	Password string `json:"password"`
+	Avatar string `json:"avatar"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
+}
+
 
 type Response struct {
 	Success bool `json:"success"`
