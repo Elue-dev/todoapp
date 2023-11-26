@@ -64,6 +64,14 @@ func GetSingleTodo(w http.ResponseWriter, r *http.Request) {
 	
 	result, err := controllers.GetTodo(todoId)
 
+	if result.ID == nil {
+		json.NewEncoder(w).Encode(models.ErrResponse{
+			Success: false,
+			Error: "Todo with the id of " + todoId + " does not exist",
+		})
+		return
+	}
+
 	if err != nil {
 		log.Fatalf("failed to get todo %v", err)
 	}
@@ -81,8 +89,17 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	var todo models.Todo
 
 	result, err := controllers.GetTodo(todoId)
+
+	if result.ID == nil {
+		json.NewEncoder(w).Encode(models.ErrResponse{
+			Success: false,
+			Error: "Todo with the id of " + todoId + " does not exist",
+		})
+		return
+	}
+
 	if err != nil {
-		log.Fatalf("todo with id of %v does not exist %v", todoId, err)
+		log.Fatalf("failed to get todo %v", err)
 	}
 
 	title := helpers.UpdateFieldBasedOfValuePresence(todo.Title, result.Title)
