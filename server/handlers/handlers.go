@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -125,8 +124,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 		return 
 	}
 
-	updatedRows, err := controllers.UpdateTodo(todoId, todo)
-	fmt.Println("total rows affected", updatedRows)
+	_, err = controllers.UpdateTodo(todoId, todo)
 
 	if err != nil {
 		log.Fatalf("could not update stock %v", err)
@@ -139,5 +137,37 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 }
 
 func DeleteTodo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	todoId := mux.Vars(r)["id"]
 
+	result, err := controllers.GetTodo(todoId)
+
+	if result.ID == nil {
+		json.NewEncoder(w).Encode(models.ErrResponse{
+			Success: false,
+			Error: "Todo with the id of " + todoId + " does not exist",
+		})
+		return
+	}
+
+	if err != nil {
+		log.Fatalf("failed to get todo %v", err)
+	}
+
+	affectedRows, err := controllers.DeleteTodo(todoId)
+	if err != nil {
+		log.Fatalf("failed to delete todo %v", err)
+	}
+
+	if affectedRows > 0 {
+		json.NewEncoder(w).Encode(models.MsgResponse{
+			Success: true,
+			Message: "Todo deleted succesfully",
+		})
+	} else {
+		json.NewEncoder(w).Encode(models.ErrResponse{
+			Success: true,
+			Error: "No todo to delete",
+		})
+	}
 }

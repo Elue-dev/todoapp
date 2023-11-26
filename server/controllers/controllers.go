@@ -98,6 +98,25 @@ func UpdateTodo(todoId string, t models.Todo) (int64, error)  {
 	return rowsAffected, err
 }
 
-func DeleteTodo(s models.Todo)  {
+func DeleteTodo(todoId string) (int64, error)  {
+	db := connections.CeateConnection()
+	defer db.Close()
 
+	sqlQuery := `DELETE FROM todos WHERE id = $1`
+
+	res, err := db.Exec(sqlQuery, todoId)
+
+	if err != nil {
+		log.Fatalf("Could not execute query %v", err)
+	}
+	
+	rowsAffected, err := res.RowsAffected()
+
+	if err != nil {
+		log.Fatalf("Could not get affected rows %v", err)
+	}
+
+	fmt.Printf("Total rows affected %v", rowsAffected)
+
+	return rowsAffected, err
 }
