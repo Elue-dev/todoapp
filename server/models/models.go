@@ -13,7 +13,8 @@ type User struct {
 	ID *string `json:"id"`
 	Email string `json:"email"`
 	Password string `json:"password"`
-	Avatar string `json:"avatar"`
+	Username string `json:"username"`
+	Avatar *string `json:"avatar"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 }

@@ -14,5 +14,7 @@ func Router() *mux.Router {
 	router.HandleFunc("/api/todos/{id}", handlers.UpdateTodo).Methods("PUT", "OPTIONS")
 	router.HandleFunc("/api/todos/{id}", handlers.DeleteTodo).Methods("DELETE", "OPTIONS")
 
+	router.HandleFunc("/api/auth/signup", handlers.SignUp).Methods("POST", "OPTIONS")
+
 	return router
 }
