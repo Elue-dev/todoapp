@@ -17,21 +17,22 @@ func AddTodo(w http.ResponseWriter, r *http.Request) {
 
 	
 	var todo models.Todo
-	
-	err := json.NewDecoder(r.Body).Decode(&todo)
 
-	isValidated := helpers.ValidateRequestBody(todo.Title, todo.Description)
-
-	if !isValidated {
-		json.NewEncoder(w).Encode(models.ErrResponse{
-			Success: false,
-			Error: "Please provide todo title and description",
-		})
-		return
-	}
-
-	if err != nil {
-		log.Fatalf("failed to decode json body %v", err)
+	if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
+		isValidated := helpers.ValidateRequestBody(todo.Title, todo.Description)
+		if !isValidated {
+			json.NewEncoder(w).Encode(models.ErrResponse{
+				Success: false,
+				Error: "Please provide todo title and description",
+			})
+		} else {
+			json.NewEncoder(w).Encode(models.ErrResponse{
+				Success: false,
+				Error: "Something went wrong, please try again",
+			})
+			log.Fatalf("failed to decode json body %v", err)
+		}
+		return 
 	}
 
 	result := controllers.CreateTodo(todo)
@@ -59,9 +60,9 @@ func GetAllTodos(w http.ResponseWriter, r *http.Request) {
 
 func GetSingleTodo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
-
-	result, err := controllers.GetTodo(params["id"])
+	todoId := mux.Vars(r)["id"]
+	
+	result, err := controllers.GetTodo(todoId)
 
 	if err != nil {
 		log.Fatalf("failed to get todo %v", err)
@@ -75,16 +76,39 @@ func GetSingleTodo(w http.ResponseWriter, r *http.Request) {
 
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	params := mux.Vars(r)
+	todoId := mux.Vars(r)["id"]
 
 	var todo models.Todo
 
-	err := json.NewDecoder(r.Body).Decode(&todo)
+	result, err := controllers.GetTodo(todoId)
 	if err != nil {
-		log.Fatalf("failed to decode json body %v", err)
+		log.Fatalf("todo with id of %v does not exist %v", todoId, err)
 	}
 
-	updatedRows, err := controllers.UpdateTodo(params["id"], todo)
+	title := helpers.UpdateFieldBasedOfValuePresence(todo.Title, result.Title)
+	description := helpers.UpdateFieldBasedOfValuePresence(todo.Description, result.Description)
+
+	todo.Title = title
+	todo.Description = description
+
+	if err := json.NewDecoder(r.Body).Decode(&todo); err != nil {
+		isValidated := helpers.ValidateReuestBodyForUpdate(todo.Title, todo.Description)
+		if !isValidated {
+			json.NewEncoder(w).Encode(models.ErrResponse{
+				Success: false,
+				Error: "Please provide at least one field to update",
+			})
+		} else {
+			json.NewEncoder(w).Encode(models.ErrResponse{
+				Success: false,
+				Error: "Something went wrong, please try again",
+			})
+			log.Fatalf("failed to decode json body %v", err)
+		}
+		return 
+	}
+
+	updatedRows, err := controllers.UpdateTodo(todoId, todo)
 	fmt.Println("total rows affected", updatedRows)
 
 	if err != nil {
