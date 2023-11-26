@@ -17,5 +17,10 @@ type Response struct {
 
 type MsgResponse struct {
 	Success bool `json:"success"`
-	Message string `json:"string"`
+	Message string `json:"message"`
+}
+
+type ErrResponse struct {
+	Success bool `json:"success"`
+	Error string `json:"error"`
 }

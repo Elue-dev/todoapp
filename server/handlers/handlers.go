@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/elue-dev/todoapi/controllers"
+	"github.com/elue-dev/todoapi/helpers"
 	"github.com/elue-dev/todoapi/models"
 	"github.com/gorilla/mux"
 )
@@ -14,9 +15,21 @@ import (
 func AddTodo(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
+	
 	var todo models.Todo
-
+	
 	err := json.NewDecoder(r.Body).Decode(&todo)
+
+	isValidated := helpers.ValidateRequestBody(todo.Title, todo.Description)
+
+	if !isValidated {
+		json.NewEncoder(w).Encode(models.ErrResponse{
+			Success: false,
+			Error: "Please provide todo title and description",
+		})
+		return
+	}
+
 	if err != nil {
 		log.Fatalf("failed to decode json body %v", err)
 	}
